@@ -1,0 +1,376 @@
+<html>
+<head>
+ <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    
+    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/jquery-ui.js"></script>
+    
+    <script src="js/jquery.panzoom.min.js"></script>
+    <script src="js/jquery.mousewheel.min.js"></script>
+    
+    <script src="js/jquery.flowchart.js"></script>
+    <script src="js/main.js"></script>
+    <link rel="stylesheet" href="css/jquery.flowchart.min.css">
+    <link rel="stylesheet" href="stylesheets/custom.css">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="flowchart-example">
+  <h4 id="advanced">Advanced : panzoom view and operator creation using drag and drop</h4>
+  <div id="chart_container">
+    <div class="flowchart-example-container" id="example_9"></div>
+  </div>
+  <div class="draggable_operators">
+    <div class="draggable_operators_label">
+    Operators (drag and drop them in the flowchart):
+    </div>
+    <div class="draggable_operators_divs">
+      <div class="draggable_operator" data-nb-inputs="1" data-nb-outputs="0">1 input</div>
+      <div class="draggable_operator" data-nb-inputs="0" data-nb-outputs="1">1 output</div>
+      <div class="draggable_operator" data-nb-inputs="1" data-nb-outputs="1">1 input &amp; 1 output</div>
+      <div class="draggable_operator" data-nb-inputs="1" data-nb-outputs="2">1 in &amp; 2 out</div>
+      <div class="draggable_operator" data-nb-inputs="2" data-nb-outputs="1">2 in &amp; 1 out</div>
+      <div class="draggable_operator" data-nb-inputs="2" data-nb-outputs="2">2 in &amp; 2 out</div>
+    </div>
+  </div>
+  <button class="delete_selected_button">Delete selected operator / link</button>
+<script type="text/javascript">
+  $(document).ready(function() {
+    var $flowchart = $('#example_9');
+    var $container = $flowchart.parent();
+    
+    var cx = $flowchart.width() / 2;
+    var cy = $flowchart.height() / 2;
+    
+    
+    // Panzoom initialization...
+    $flowchart.panzoom();
+    
+    // Centering panzoom
+    $flowchart.panzoom('pan', -cx + $container.width() / 2, -cy + $container.height() / 2);
+
+    // Panzoom zoom handling...
+    var possibleZooms = [0.5, 0.75, 1, 2, 3];
+    var currentZoom = 2;
+    $container.on('mousewheel.focal', function( e ) {
+        e.preventDefault();
+        var delta = (e.delta || e.originalEvent.wheelDelta) || e.originalEvent.detail;
+        var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
+        currentZoom = Math.max(0, Math.min(possibleZooms.length - 1, (currentZoom + (zoomOut * 2 - 1))));
+        $flowchart.flowchart('setPositionRatio', possibleZooms[currentZoom]);
+        $flowchart.panzoom('zoom', possibleZooms[currentZoom], {
+            animate: false,
+            focal: e
+        });
+    });
+    
+    var data = {
+      operators: {
+        operator1: {
+          top: cy - 100,
+          left: cx - 200,
+          properties: {
+            title: 'Operator 1',
+            inputs: {},
+            outputs: {
+              output_1: {
+                label: 'Output 1',
+              }
+            }
+          }
+        },
+        operator2: {
+          top: cy,
+          left: cx + 140,
+          properties: {
+            title: 'Operator 2',
+            inputs: {
+              input_1: {
+                label: 'Input 1',
+              },
+              input_2: {
+                label: 'Input 2',
+              },
+            },
+            outputs: {}
+          }
+        },
+      },
+      links: {
+        link_1: {
+          fromOperator: 'operator1',
+          fromConnector: 'output_1',
+          toOperator: 'operator2',
+          toConnector: 'input_2',
+        },
+      }
+    };
+    
+
+    // Apply the plugin on a standard, empty div...
+    $flowchart.flowchart({
+      data: data
+    });
+
+    $flowchart.parent().siblings('.delete_selected_button').click(function() {
+      $flowchart.flowchart('deleteSelected');
+    });
+    
+    
+    var $draggableOperators = $('.draggable_operator');
+    
+    function getOperatorData($element) {
+      var nbInputs = parseInt($element.data('nb-inputs'));
+      var nbOutputs = parseInt($element.data('nb-outputs'));
+      var data = {
+        properties: {
+          title: $element.text(),
+          inputs: {},
+          outputs: {}
+        } 
+      };
+      
+      var i = 0;
+      for (i = 0; i < nbInputs; i++) {
+        data.properties.inputs['input_' + i] = {
+          label: 'Input ' + (i + 1)
+        };
+      }
+      for (i = 0; i < nbOutputs; i++) {
+        data.properties.outputs['output_' + i] = {
+          label: 'Output ' + (i + 1)
+        };
+      }
+      
+      return data;
+    }
+    
+    var operatorId = 0;
+        
+    $draggableOperators.draggable({
+        cursor: "move",
+        opacity: 0.7,
+        
+        helper: 'clone', 
+        appendTo: 'body',
+        zIndex: 1000,
+        
+        helper: function(e) {
+          var $this = $(this);
+          var data = getOperatorData($this);
+          return $flowchart.flowchart('getOperatorElement', data);
+        },
+        stop: function(e, ui) {
+            var $this = $(this);
+            var elOffset = ui.offset;
+            var containerOffset = $container.offset();
+            if (elOffset.left > containerOffset.left &&
+                elOffset.top > containerOffset.top && 
+                elOffset.left < containerOffset.left + $container.width() &&
+                elOffset.top < containerOffset.top + $container.height()) {
+
+                var flowchartOffset = $flowchart.offset();
+
+                var relativeLeft = elOffset.left - flowchartOffset.left;
+                var relativeTop = elOffset.top - flowchartOffset.top;
+
+                var positionRatio = $flowchart.flowchart('getPositionRatio');
+                relativeLeft /= positionRatio;
+                relativeTop /= positionRatio;
+                
+                var data = getOperatorData($this);
+                data.left = relativeLeft;
+                data.top = relativeTop;
+                
+                $flowchart.flowchart('addOperator', data);
+            }
+        }
+    });
+    
+    
+  });
+</script>
+  <p class="flowchart-example-description">In addition to the create and delete buttons, two buttons has been added allowing you to get and set the flowchart's data.</p>
+</div>
+<div class="flowchart-example">
+  <h4>Get / set flowchart data</h4>
+  <div class="flowchart-example-container" id="example_7"></div>
+  <button class="create_operator">Create operator</button>
+  <button class="delete_selected_button">Delete selected operator / link</button>
+  <button class="get_data">Get data</button>
+  <button class="set_data">Set data</button>
+  <div>
+    <textarea id="flowchart_data"></textarea>
+  </div>
+<script type="text/javascript">
+  $(document).ready(function() {
+    var data = {
+      operators: {
+        operator1: {
+          top: 20,
+          left: 20,
+          properties: {
+            title: 'Operator 1',
+            inputs: {},
+            outputs: {
+              output_1: {
+                label: 'Output 1',
+              },
+              output_2: {
+                label: 'Output 2',
+              },
+              output_3: {
+                label: 'Output 3',
+              },
+              output_4: {
+                label: 'Output 4',
+              },
+              output_5: {
+                label: 'Output 5',
+              }
+            }
+          }
+        },
+        operator2: {
+          top: 80,
+          left: 300,
+          properties: {
+            title: 'Operator 2',
+            inputs: {
+              input_1: {
+                label: 'Input 1',
+              },
+              input_2: {
+                label: 'Input 2',
+              },
+              
+              input_3: {
+                label: 'Input 3',
+              }
+              ,
+              input_4: {
+                label: 'Input 4',
+              }
+              ,
+              input_5: {
+                label: 'Input 5',
+              }
+            },
+            outputs: {}
+          }
+        },
+      },
+      // links: {
+      //   link_1: {
+      //     fromOperator: 'operator1',
+      //     fromConnector: 'output_1',
+      //     toOperator: 'operator2',
+      //     toConnector: 'input_1',
+      //   },
+      //   link_2: {
+      //     fromOperator: 'operator1',
+      //     fromConnector: 'output_2',
+      //     toOperator: 'operator2',
+      //     toConnector: 'input_2',
+      //   },
+      //   link_3: {
+      //     fromOperator: 'operator1',
+      //     fromConnector: 'output_3',
+      //     toOperator: 'operator2',
+      //     toConnector: 'input_3',
+      //   },
+      //   link_4: {
+      //     fromOperator: 'operator1',
+      //     fromConnector: 'output_4',
+      //     toOperator: 'operator2',
+      //     toConnector: 'input_4',
+      //   },
+      //   link_5: {
+      //     fromOperator: 'operator1',
+      //     fromConnector: 'output_5',
+      //     toOperator: 'operator2',
+      //     toConnector: 'input_5',
+      //   },
+      // }
+    };
+
+    // Apply the plugin on a standard, empty div...
+    var $flowchart = $('#example_7');
+    $flowchart.flowchart({
+      data: data
+    });
+    
+    var operatorI = 0;
+    $flowchart.siblings('.create_operator').click(function() {
+      var operatorId = 'created_operator_' + operatorI;
+      var operatorData = {
+        top: 60,
+        left: 500,
+        properties: {
+          title: 'Operator ' + (operatorI + 3),
+          inputs: {
+            input_1: {
+              label: 'Input 1',
+            }
+          },
+          outputs: {
+            output_1: {
+              label: 'Output 1',
+            }
+          }
+        }
+      };
+      
+      operatorI++;
+      
+      $flowchart.flowchart('createOperator', operatorId, operatorData);
+    });
+    
+    $flowchart.siblings('.delete_selected_button').click(function() {
+      $flowchart.flowchart('deleteSelected');
+    });
+    
+    $flowchart.siblings('.get_data').click(function() {
+      var data = $flowchart.flowchart('getData');
+      $('#flowchart_data').val(JSON.stringify(data, null, 2));
+    });
+    
+    $flowchart.siblings('.set_data').click(function() {
+      var data = JSON.parse($('#flowchart_data').val());
+      $flowchart.flowchart('setData', data);
+    });
+  });
+</script>
+  <p class="flowchart-example-description">In addition to the create and delete buttons, two buttons has been added allowing you to get and set the flowchart's data.</p>
+</div>
+</body>
+<style>
+.flowchart-example-container {
+    height: 300px;
+    border: 1px solid #BBB;
+    margin-bottom: 10px;
+}
+#chart_container {
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    background: repeating-linear-gradient( 45deg, #eee, #eee 10px, #e5e5e5 10px, #e5e5e5 20px );
+    border: 1px solid black;
+}
+.flowchart-operator .flowchart-operator-inputs-outputs{
+	background: url('./imgs/Man-14-64.png') no-repeat center center;
+	height: 64px;
+	vertical-align: middle;
+
+
+}
+</style>
+</html>
