@@ -25,9 +25,7 @@
 <body>
 <div class="flowchart-example">
   <h4 id="advanced">Advanced : panzoom view and operator creation using drag and drop</h4>
-  <div id="chart_container">
-    <div class="flowchart-example-container" id="example_9"></div>
-  </div>
+  
   <div class="draggable_operators">
     <div class="draggable_operators_label">
     Operators (drag and drop them in the flowchart):
@@ -40,6 +38,9 @@
       <div class="draggable_operator" data-nb-inputs="2" data-nb-outputs="1">2 in &amp; 1 out</div>
       <div class="draggable_operator" data-nb-inputs="2" data-nb-outputs="2">2 in &amp; 2 out</div>
     </div>
+  </div>
+  <div id="chart_container">
+    <div class="flowchart-example-container" id="example_9"></div>
   </div>
   <button class="delete_selected_button">Delete selected operator / link</button>
 <script type="text/javascript">
@@ -371,6 +372,18 @@
 	vertical-align: middle;
 
 
+}
+
+#chart_container{
+  float:left;
+  width:80%;
+}
+.draggable_operators{
+  float:left;
+  width:18%;
+}
+.draggable_operator{
+  display: block;
 }
 </style>
 </html>
