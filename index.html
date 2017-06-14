@@ -31,12 +31,12 @@
     Operators (drag and drop them in the flowchart):
     </div>
     <div class="draggable_operators_divs">
-      <div class="draggable_operator" data-nb-inputs="1" data-nb-outputs="0">1 input</div>
-      <div class="draggable_operator" data-nb-inputs="0" data-nb-outputs="1">1 output</div>
-      <div class="draggable_operator" data-nb-inputs="1" data-nb-outputs="1">1 input &amp; 1 output</div>
-      <div class="draggable_operator" data-nb-inputs="1" data-nb-outputs="2">1 in &amp; 2 out</div>
-      <div class="draggable_operator" data-nb-inputs="2" data-nb-outputs="1">2 in &amp; 1 out</div>
-      <div class="draggable_operator" data-nb-inputs="2" data-nb-outputs="2">2 in &amp; 2 out</div>
+      <div class="draggable_operator" data-role="a" data-nb-inputs="1" data-nb-outputs="0">a.總經理</div>
+      <div class="draggable_operator" data-role="b" data-nb-inputs="0" data-nb-outputs="1">b.副總經理</div>
+      <div class="draggable_operator" data-role="c" data-nb-inputs="1" data-nb-outputs="1">c.協理</div>
+      <div class="draggable_operator" data-role="d" data-nb-inputs="1" data-nb-outputs="2">d.經理</div>
+      <div class="draggable_operator" data-role="e" data-nb-inputs="2" data-nb-outputs="1">e.副理</div>
+      <div class="draggable_operator" data-role="f" data-nb-inputs="2" data-nb-outputs="2">f.襄理</div>
     </div>
   </div>
   <div id="chart_container">
@@ -129,11 +129,13 @@
     var $draggableOperators = $('.draggable_operator');
     
     function getOperatorData($element) {
+      var nbrole = $element.data('role');
       var nbInputs = parseInt($element.data('nb-inputs'));
       var nbOutputs = parseInt($element.data('nb-outputs'));
       var data = {
         properties: {
           title: $element.text(),
+          class: nbrole,
           inputs: {},
           outputs: {}
         } 
@@ -366,10 +368,45 @@
     background: repeating-linear-gradient( 45deg, #eee, #eee 10px, #e5e5e5 10px, #e5e5e5 20px );
     border: 1px solid black;
 }
-.flowchart-operator .flowchart-operator-inputs-outputs{
-	background: url('./imgs/Man-14-64.png') no-repeat center center;
-	height: 64px;
+.flowchart-operator.a{
+	background:#fff url('./imgs/a.png') no-repeat center center;
+	min-height: 128px;
 	vertical-align: middle;
+
+
+}
+.flowchart-operator.b{
+  background:#fff url('./imgs/b.png') no-repeat center center;
+  min-height: 128px;
+  vertical-align: middle;
+
+
+}
+.flowchart-operator.c{
+  background:#fff url('./imgs/c.png') no-repeat center center;
+  min-height: 128px;
+  vertical-align: middle;
+
+
+}
+.flowchart-operator.d{
+  background:#fff url('./imgs/d.png') no-repeat center center;
+  min-height: 128px;
+  vertical-align: middle;
+
+
+}
+.flowchart-operator.e{
+  background:#fff url('./imgs/e.png') no-repeat center center;
+  min-height: 128px;
+  vertical-align: middle;
+
+
+}
+.flowchart-operator.f{
+  background:#fff url('./imgs/f.png') no-repeat center center;
+  min-height: 128px;
+  vertical-align: middle;
 
 
 }
