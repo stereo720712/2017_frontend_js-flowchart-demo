@@ -1,4 +1,5 @@
-{
+
+"{
   "result": "success",
   "nodeList": [
     {
@@ -118,118 +119,118 @@
   ],
   "pathList": [
     {
-      "linkID": "397",
-      "fromOperator": "297",
-      "toOperator": "306",
+      "linkID": "n397",
+      "fromOperator": "n297",
+      "toOperator": "n306",
       "fCondition": "拒绝"
     },
     {
-      "linkID": "396",
-      "fromOperator": "296",
-      "toOperator": "305",
+      "linkID": "n396",
+      "fromOperator": "n296",
+      "toOperator": "n305",
       "fCondition": "拒绝"
     },
     {
-      "linkID": "395",
-      "fromOperator": "295",
-      "toOperator": "304",
+      "linkID": "n395",
+      "fromOperator": "n295",
+      "toOperator": "n304",
       "fCondition": "拒绝"
     },
     {
-      "linkID": "394",
-      "fromOperator": "294",
-      "toOperator": "303",
+      "linkID": "n394",
+      "fromOperator": "n294",
+      "toOperator": "n303",
       "fCondition": "拒绝"
     },
     {
-      "linkID": "393",
-      "fromOperator": "293",
-      "toOperator": "302",
+      "linkID": "n393",
+      "fromOperator": "n293",
+      "toOperator": "n302",
       "fCondition": "拒绝"
     },
     {
-      "linkID": "392",
-      "fromOperator": "291",
-      "toOperator": "301",
+      "linkID": "n392",
+      "fromOperator": "n291",
+      "toOperator": "n301",
       "fCondition": "拒绝"
     },
     {
-      "linkID": "391",
-      "fromOperator": "290",
-      "toOperator": "300",
+      "linkID": "n391",
+      "fromOperator": "n290",
+      "toOperator": "n300",
       "fCondition": "拒绝"
     },
     {
-      "linkID": "390",
-      "fromOperator": "298",
-      "toOperator": "299",
+      "linkID": "n390",
+      "fromOperator": "n298",
+      "toOperator": "n299",
       "fCondition": "完成"
     },
     {
-      "linkID": "389",
-      "fromOperator": "297",
-      "toOperator": "298",
+      "linkID": "n389",
+      "fromOperator": "n297",
+      "toOperator": "n298",
       "fCondition": "同意"
     },
     {
-      "linkID": "388",
-      "fromOperator": "296",
-      "toOperator": "297",
+      "linkID": "n388",
+      "fromOperator": "n296",
+      "toOperator": "n297",
       "fCondition": "同意"
     },
     {
-      "linkID": "387",
-      "fromOperator": "295",
-      "toOperator": "296",
+      "linkID": "n387",
+      "fromOperator": "n295",
+      "toOperator": "n296",
       "fCondition": "同意"
     },
     {
-      "linkID": "386",
-      "fromOperator": "294",
-      "toOperator": "296",
+      "linkID": "n386",
+      "fromOperator": "n294",
+      "toOperator": "n296",
       "fCondition": "同意"
     },
     {
-      "linkID": "385",
-      "fromOperator": "293",
-      "toOperator": "296",
+      "linkID": "n385",
+      "fromOperator": "n293",
+      "toOperator": "n296",
       "fCondition": "同意"
     },
     {
-      "linkID": "384",
-      "fromOperator": "292",
-      "toOperator": "295",
+      "linkID": "n384",
+      "fromOperator": "n292",
+      "toOperator": "n295",
       "fCondition": "Others"
     },
     {
-      "linkID": "383",
-      "fromOperator": "292",
-      "toOperator": "294",
+      "linkID": "n383",
+      "fromOperator": "n292",
+      "toOperator": "n294",
       "fCondition": "FAS"
     },
     {
-      "linkID": "382",
-      "fromOperator": "292",
-      "toOperator": "293",
+      "linkID": "n382",
+      "fromOperator": "n292",
+      "toOperator": "n293",
       "fCondition": "IBQS"
     },
     {
-      "linkID": "381",
-      "fromOperator": "291",
-      "toOperator": "292",
+      "linkID": "n381",
+      "fromOperator": "n291",
+      "toOperator": "n292",
       "fCondition": "同意"
     },
     {
-      "linkID": "380",
-      "fromOperator": "290",
-      "toOperator": "291",
+      "linkID": "n380",
+      "fromOperator": "n290",
+      "toOperator": "n291",
       "fCondition": "同意"
     },
     {
-      "linkID": "379",
-      "fromOperator": "309",
-      "toOperator": "290",
+      "linkID": "n379",
+      "fromOperator": "n309",
+      "toOperator": "n290",
       "fCondition": "发起"
     }
   ]
-}
+}"
