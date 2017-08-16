@@ -1,1 +1,235 @@
-fff
+{
+  "result": "success",
+  "nodeList": [
+    {
+      "nodeID": "n309",
+      "title": "开始",
+      "typeCode": "C001",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n307",
+      "title": "用户取消",
+      "typeCode": "C007",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n306",
+      "title": "SW部级终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n305",
+      "title": "SW课级终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n304",
+      "title": "EPM终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n303",
+      "title": "EPM_FAS终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n302",
+      "title": "EPM_IBQS终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n301",
+      "title": "部级终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n300",
+      "title": "课级终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n299",
+      "title": "结束",
+      "typeCode": "C006",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n298",
+      "title": "SW经办",
+      "typeCode": "C005",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n297",
+      "title": "SW部级签核",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n296",
+      "title": "SW课级签核",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n295",
+      "title": "EPM择签",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n294",
+      "title": "EPM_FAS签核",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n293",
+      "title": "EPM_IBQS签核",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n292",
+      "title": "系统判断",
+      "typeCode": "C004",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n291",
+      "title": "部级签核",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n290",
+      "title": "课级签核",
+      "typeCode": "C003",
+      "fCode": ""
+    }
+  ],
+  "pathList": [
+    {
+      "linkID": "397",
+      "fromOperator": "297",
+      "toOperator": "306",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "396",
+      "fromOperator": "296",
+      "toOperator": "305",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "395",
+      "fromOperator": "295",
+      "toOperator": "304",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "394",
+      "fromOperator": "294",
+      "toOperator": "303",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "393",
+      "fromOperator": "293",
+      "toOperator": "302",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "392",
+      "fromOperator": "291",
+      "toOperator": "301",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "391",
+      "fromOperator": "290",
+      "toOperator": "300",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "390",
+      "fromOperator": "298",
+      "toOperator": "299",
+      "fCondition": "完成"
+    },
+    {
+      "linkID": "389",
+      "fromOperator": "297",
+      "toOperator": "298",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "388",
+      "fromOperator": "296",
+      "toOperator": "297",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "387",
+      "fromOperator": "295",
+      "toOperator": "296",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "386",
+      "fromOperator": "294",
+      "toOperator": "296",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "385",
+      "fromOperator": "293",
+      "toOperator": "296",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "384",
+      "fromOperator": "292",
+      "toOperator": "295",
+      "fCondition": "Others"
+    },
+    {
+      "linkID": "383",
+      "fromOperator": "292",
+      "toOperator": "294",
+      "fCondition": "FAS"
+    },
+    {
+      "linkID": "382",
+      "fromOperator": "292",
+      "toOperator": "293",
+      "fCondition": "IBQS"
+    },
+    {
+      "linkID": "381",
+      "fromOperator": "291",
+      "toOperator": "292",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "380",
+      "fromOperator": "290",
+      "toOperator": "291",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "379",
+      "fromOperator": "309",
+      "toOperator": "290",
+      "fCondition": "发起"
+    }
+  ]
+}
