@@ -1,0 +1,616 @@
+<html>
+<head>
+ <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    
+    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/jquery-ui.js"></script>
+     <script src="js/jquery.flowchart.js"></script>
+    <script src="js/jquery.panzoom.min.js"></script>
+    <script src="js/jquery.mousewheel.min.js"></script>
+    
+   
+    <!-- <script src="js/main.js"></script> -->
+    <link rel="stylesheet" href="css/jquery.flowchart.css">
+    <link rel="stylesheet" href="stylesheets/custom.css">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<h2>NewXsign Flow Chart Client Function Demo</h2>
+<div id="chart_container">
+  <div>
+    <textarea id="flowchart_data_text"></textarea>  
+  </div>
+
+  <div class="flowchart-example-container" id="flowChart"></div>
+
+   
+
+</div>
+
+<!-- test for real data with templateDetail call api : CallSignTemplateFlow.ashx
+-->
+<script type="text/javascript">
+
+ /*
+   1.call api to get template data , we use local data replace.
+   2.parse template json to flow chart json and draw it
+  */
+  /*
+    Step2. function parse_Sign_To_Chart_Json
+      think big step:1.get a node data , 2.get inputs node list, 3.get outputs node list , 4.get outputs path list 
+     2.1 if result is not success  return "" else do next
+     2.2 get node List and path List (Json Object) 
+     2.3 find start node all data  you need to draw ()
+     2.4 find start node inputs intput list (those nodes whom comes to start nodes should be zero)
+     
+  */
+  
+  //Const JSON KEY 
+  const J_TYPE_CODE       = 'typeCode';
+  const J_LINK_ID         = "linkID";
+  const J_NODEID          = "nodeID";
+  
+  const J_OPERAOTRS       = "operators";
+  const J_LINKS           = "links";
+  const J_PROPERTIES      = "properties";
+  const J_TITLE           = "title";
+  const J_INPUTS          = "inputs";
+  const J_OUTPUTS         = "outputs";
+  const J_TOP             = "top";
+  const J_LEFT            = "left";
+
+  const J_FROM_OPERATOR   = "fromOperator";
+  const J_FROM_CONNECTOR  = "fromConnector";
+  const J_TO_OPERATOR     = "toOperator";
+  const J_TO_CONNECTOR    = "toConnector";
+  const J_FCONDITION      = "fCondition";
+  const J_LABEL           = "label";
+ 
+
+
+  var temp_current_inputs_node_list   = [];// nodes list whom come to current nodes  (be a list , it may so much nodes come to one nodes)
+  var temp_current_outputs_node_list  = [];//nodes list whom current nodes go to other list
+  var temp_current_path_inputs_list   = [];// temp store current node path where other nodes go to current path
+  var temp_current_path_outputs_list  = [];//temp store current node path to go other nodes.
+  var need_Remove_Path_ID_Temp_List   = [];//temp record the path can be removed
+
+  var flowchartJson = {J_OPERAOTRS:{},J_LINKS:{}}; // final finish to return
+  //cout for use to count location
+  var total_width_level_count = 1 ; //node width level,start node level location is 0
+  var widthUnit               = 100 ;// one node level width base distance
+  var temp_heitht_level_count = 1;  //every temp height level in the width level
+  var heightUnit              = 30; //
+
+  //current draw  node start location
+  var top   =   20;
+  var left  =   20;
+
+/*
+ Node              : node want to add
+ flowchartJsonToAdd : final chart json data to draw
+
+
+input label: inputs node  title?
+
+*/
+function addNodeToChartJson(node,flowChartJsonToAdd,
+  width_level_count,heigh_level_count,
+  current_inputs_node_list,current_outputs_node_list,
+  current_path_inputs_list,current_path_outputs_list)
+{
+
+  var jInputs = {};
+  var jOutputs = {};
+  var links = []; //只有output path 需要加入,因为inpu path 会在上一次被加入
+
+  //從output 開始想
+  if (current_path_outputs_list.length > 0) {
+    for (var i = 0; i < current_path_outputs_list.length; i++) {
+        var tPath = current_path_outputs_list[i];
+        var tNode = current_outputs_node_list[i];
+        //step by step , one ouput , one link 
+        jOutputs[tPath.J_TO_OPERATOR] = {J_LABEL:tPath.J_FCONDITION}; 
+        var jLinkObj = {};//map this  output 
+        jLinkObj[J_FROM_OPERATOR]  = tPath.J_FROM_OPERATOR;
+        jLinkObj[J_FROM_CONNECTOR] = tPath.J_FCONDITION; //node output id
+        jLinkObj[J_TO_OPERATOR]    = tPath.J_TO_OPERATOR;
+        jLinkObj[J_TO_CONNECTOR]   = tPath.J_FROM_OPERATOR //set and store it !
+        flowChartJsonToAdd.J_LINKS[tPath.J_LINK_ID] = jLinkObj;
+    }//for
+  }// outputs path > 0
+
+      //inputs execute
+    if (current_path_inputs_list.length > 0) 
+    {
+    
+    }// inputs    
+    var properties = {};
+    properties[J_TITLE] = node.J_TITLE;
+    properties[J_INPUTS] = jInputs;//--------------------NOT DO NOW
+    properties[J_OUTPUTS] = jOutputs;
+
+   var chartNode = {};
+   chartNode[J_PROPERTIES] = properties;
+   chartNode[J_LEFT] = width_level_count*widthUnit;
+   chartNode[J_TOP] = heigh_level_count*heightUnit;
+   flowChartJsonToAdd[node.J_NODEID] = chartNode;
+
+   //test
+   var temp = JSON.stringify(flowchartJson, null, 2);
+
+   alert(temp);
+
+}//addChartNode
+
+
+
+
+  // remove the path @ pathList
+  function removeTempPathFromList(tempPathIDList,pathLsitToRemove){
+      while(tempPathIDList.count > 0 )
+      {
+          var pathID = tempPathIDList[0];
+          for (var i = 0; i < pathLsitToRemove.length; i++) {
+                if (pathLsitToRemove[i].J_LINK_ID == pathID) 
+                {
+                  pathLsitToRemove.splice(i,1);
+                  tempPathIDList.splice(0,1);
+                  break;
+                }//if
+          }//for
+      }//while
+  } //removeTempPathFromList
+
+//parse template json to final chart json   
+function parse_Sign_To_Chart_Json(data) 
+{ // sign template json data to draw json data 
+  
+  
+
+  var currentNode = null; // the temp node operate now 
+    //step1 get result
+    var getResult = data['result'];
+      //2.1
+      if (getResult !== "success") 
+      {
+          return "";
+      }
+      //2.2
+      var nodeList = data['nodeList'];
+      var pathList = data['pathList'];
+      data = {}; // clear data 
+      //2.3 find start node (typeCode = C001)
+      for(var i = 0; i < nodeList.length;i++)
+      {
+         if(nodeList[i][J_TYPE_CODE]== 'C001'){
+              currentNode = nodeList[i];
+              nodeList.splice(i,1);
+            break;
+         }//if 
+      }//for
+      
+      //2.4.1 find inputs path, nodes list go current node
+      //(in here, there is no input from other node to start node,but it common step)    
+       for (var i = 0; i < pathList.length ;i++) 
+        {    
+          //find the path is go to current node
+          if(pathList[i][J_TO_OPERATOR] == currentNode[J_NODEID])
+          {
+              // record the input path
+              temp_current_path_inputs_list.push(pathList[i]);
+              //need_Remove_Path_ID_Temp_List.push(tempPath[J_LINK_ID]);
+
+              for (var j = 0; j < nodeList.length; j++) {
+                if(nodeList[j][J_NODEID] == tempPath[J_FROM_OPERATOR])
+                {
+                    temp_current_inputs_node_list.push(nodeList[j]);
+                    break;
+                }
+              }//for
+          }// if end ,, find to current node's path
+       }//for
+       //only remove input now
+       //removeTempPathFromList(need_Remove_Path_ID_Temp_List,pathList);// remove the path used
+
+       //2.4.2 find outputs path, nodes list from current nodes
+        for (var i=0;i<pathList.length;i++) {
+            
+            if (pathList[i][J_FROM_OPERATOR] == currentNode[J_NODEID]) 
+            {
+                temp_current_path_outputs_list.push(pathList[i]);
+                for (var j = 0; j < nodeList.length; j++) {
+                  if(nodeList[j][J_NODEID] == pathList[i][J_TO_OPERATOR]){
+                    temp_current_outputs_node_list.push(nodeList[j]);
+                    break;
+                  }//if
+                }//for
+            }// if
+        }//for
+
+        //debug
+        test = 0;
+
+        //2.5 generate flow chart node and add it to chart json object
+        addNodeToChartJson(currentNode,flowchartJson,
+        total_width_level_count,temp_heitht_level_count,
+        temp_current_inputs_node_list,temp_current_outputs_node_list,
+        temp_current_path_inputs_list,temp_current_path_outputs_list);
+
+      return flowchartJson;
+} //parse_Sign_To_Chart_Json
+
+
+
+
+function draw(data){
+  if (data == "") {
+    //fail execute
+    showTempMessage("error");
+  } 
+  else 
+  {
+
+    data = parse_Sign_To_Chart_Json(data);
+    $('#flowChart').flowchart(
+    {
+      data:data,
+      canUserEditLinks:false,
+      canUserMoveOperators:false
+    }
+    );
+
+  }
+}//draw
+
+
+
+
+$(document).ready(
+    function(){
+
+        draw(tempData);
+
+    }//func
+  );
+
+function showTempMessage(mess){
+    $('#flowchart_data_text').val(JSON.stringify(mess, null, 2));
+}//
+
+function syntaxHighlight(json) {
+    if (typeof json != 'string') {
+         json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+}//syntaxHighlight
+
+ var tempData = {
+  "result": "success",
+  "nodeList": [
+    {
+      "nodeID": "n309",
+      "title": "开始",
+      "typeCode": "C001",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n307",
+      "title": "用户取消",
+      "typeCode": "C007",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n306",
+      "title": "SW部级终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n305",
+      "title": "SW课级终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n304",
+      "title": "EPM终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n303",
+      "title": "EPM_FAS终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n302",
+      "title": "EPM_IBQS终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n301",
+      "title": "部级终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n300",
+      "title": "课级终止",
+      "typeCode": "C002",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n299",
+      "title": "结束",
+      "typeCode": "C006",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n298",
+      "title": "SW经办",
+      "typeCode": "C005",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n297",
+      "title": "SW部级签核",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n296",
+      "title": "SW课级签核",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n295",
+      "title": "EPM择签",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n294",
+      "title": "EPM_FAS签核",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n293",
+      "title": "EPM_IBQS签核",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n292",
+      "title": "系统判断",
+      "typeCode": "C004",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n291",
+      "title": "部级签核",
+      "typeCode": "C003",
+      "fCode": ""
+    },
+    {
+      "nodeID": "n290",
+      "title": "课级签核",
+      "typeCode": "C003",
+      "fCode": ""
+    }
+  ],
+  "pathList": [
+    {
+      "linkID": "n397",
+      "fromOperator": "n297",
+      "toOperator": "n306",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "n396",
+      "fromOperator": "n296",
+      "toOperator": "n305",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "n395",
+      "fromOperator": "n295",
+      "toOperator": "n304",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "n394",
+      "fromOperator": "n294",
+      "toOperator": "n303",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "n393",
+      "fromOperator": "n293",
+      "toOperator": "n302",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "n392",
+      "fromOperator": "n291",
+      "toOperator": "n301",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "n391",
+      "fromOperator": "n290",
+      "toOperator": "n300",
+      "fCondition": "拒绝"
+    },
+    {
+      "linkID": "n390",
+      "fromOperator": "n298",
+      "toOperator": "n299",
+      "fCondition": "完成"
+    },
+    {
+      "linkID": "n389",
+      "fromOperator": "n297",
+      "toOperator": "n298",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "n388",
+      "fromOperator": "n296",
+      "toOperator": "n297",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "n387",
+      "fromOperator": "n295",
+      "toOperator": "n296",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "n386",
+      "fromOperator": "n294",
+      "toOperator": "n296",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "n385",
+      "fromOperator": "n293",
+      "toOperator": "n296",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "n384",
+      "fromOperator": "n292",
+      "toOperator": "n295",
+      "fCondition": "Others"
+    },
+    {
+      "linkID": "n383",
+      "fromOperator": "n292",
+      "toOperator": "n294",
+      "fCondition": "FAS"
+    },
+    {
+      "linkID": "n382",
+      "fromOperator": "n292",
+      "toOperator": "n293",
+      "fCondition": "IBQS"
+    },
+    {
+      "linkID": "n381",
+      "fromOperator": "n291",
+      "toOperator": "n292",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "n380",
+      "fromOperator": "n290",
+      "toOperator": "n291",
+      "fCondition": "同意"
+    },
+    {
+      "linkID": "n379",
+      "fromOperator": "n309",
+      "toOperator": "n290",
+      "fCondition": "发起"
+    }
+  ]
+};
+</script>
+
+</body>
+
+<style>
+.flowchart-example-container {
+    height: 300px;
+    border: 1px solid #BBB;
+    margin-bottom: 10px;
+}
+#chart_container {
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    background: repeating-linear-gradient( 45deg, #eee, #eee 10px, #e5e5e5 10px, #e5e5e5 20px );
+    border: 1px solid black;
+}
+.flowchart-operator.a{
+	background:#fff url('./imgs/a.png') no-repeat center center;
+	min-height: 80px;
+	vertical-align: middle;
+
+
+}
+.flowchart-operator.b{
+  background:#fff url('./imgs/b.png') no-repeat center center;
+  min-height: 90px;
+  vertical-align: middle;
+
+
+}
+.flowchart-operator.c{
+  background:#fff url('./imgs/c.png') no-repeat center center;
+  min-height: 90px;
+  vertical-align: middle;
+
+
+}
+.flowchart-operator.d{
+  background:#fff url('./imgs/d.png') no-repeat center center;
+  min-height: 90px;
+  vertical-align: middle;
+
+
+}
+.flowchart-operator.e{
+  background:#fff url('./imgs/e.png') no-repeat center center;
+  min-height: 90px;
+  vertical-align: middle;
+
+
+}
+.flowchart-operator.f
+{
+  background:#fff url('./imgs/f.png') no-repeat center center;
+  min-height: 90px;
+  vertical-align: middle;
+}
+
+#chart_container{
+  float:left;
+  width:80%;
+}
+.draggable_operators{
+  float:left;
+  width:18%;
+}
+.draggable_operator{
+  display: block;
+}
+</style>
+</html>
