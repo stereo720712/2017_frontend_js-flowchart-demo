@@ -1,0 +1,183 @@
+
+I.File add and modified in Xtrack Project for flowChart
+
+1.Add Files in folder Framework.web/Manager/js/jqchart/
+(flow chart j-query lib)
+2.Add Files in folder Framework.web/Manager/js/newXsign
+(self write for get template data and show flow cahrt)
+3.Modified Framework/Data/NewXsign/NEWXSIGN_OracleDataProvider.cs
+(add a api from newXsign websevice called sean)
+4.Modified Framework.web/Manager/Module/NEWXSIGN/SystemManage/Template/Process/TemplateList.aspx
+(in TemplateDetail link , add Code parameter)
+5.Modified Framework.web/Manager/Module/NEWXSIGN/SystemManage/Template/Process/TemplateDetail.aspx
+(add code to show flow cahrt )
+6.Add  Framework.web/Manager/Module/NEWXSIGN/SystemManage/Template/Process/CallSignTemplateFlow.ashx
+
+
+II.Template data to template flow chart  
+
+Big Step1: js chart json string generate api
+
+Http parameter :
+	1.sign template id number 
+
+1. j-query flow chart lib 
+
+1.1 flow chart data structure
+		
+模版流程图资料结构 Json Structure  Defination :
+
+{result:"success",
+nodeLevelList:
+	[ 
+		
+			//level1 
+			
+				[nodeObj1,nodeObj2,...],
+		
+		
+			//level2
+			
+				[nodeObj1,nodeObj2,...]
+		
+			//...levelN
+
+	…]//NodeList
+	,
+
+	PathList:
+	[
+			//level1
+				[pathInfoArray1,pathInfoArray2,...],
+
+			//level2
+				[pathInfoArray1,pathInfoArray2,....]
+
+			...			
+
+	]//PathList	
+
+	}//obj SignTemplate
+
+
+
+Chart Node Define :
+
+	nodeObj:
+	{
+		nodeID:"309",
+		nodeTitle:"开始",
+		//问题点：跟路径有关----
+		input label array 
+		条件:Path.NextNodeID = self.nodeID
+		output label array
+		 Dno条件：Path.PrevNodeID = self.nodeID
+	}//nodeObj
+
+
+Path for node define //??? 一个节点 记录每个所有的 路径阵列？
+以同一个 FPREVNODEID 为一组, 收集成一亇 json array?
+
+PathInfo Structure
+ex1:
+{
+	prevNodeID:"309",//===============map link fromOperator
+	pathArr:[
+		{
+			pathID:"",// for operator inputID or outputID
+			nextNodeID:"290",//===============map link toOperator
+			condition:"发起" //======output label
+		}
+	]
+}//ex1
+
+ex2:
+{
+	prevNodeID:"290",
+	pathArr:
+	[
+	{nextNodeID:"291",condition:"同意"},
+	{nextNodeID:"300",condition:"拒绝"}
+	]
+}//
+
+//==================================
+  link_1: {
+            fromOperator: 'start', 		//=========PrevNodeID
+            fromConnector: 'output_0',	//=========
+            toOperator: 'level1',
+            toConnector: 'input_0',
+           }
+
+//===========================================COMMENT
+ 一次做好一亇节点的图节点与路径资料 在回圈？
+
+2.
+Node type:
+	fcode  fname
+	C006	结束节点
+	C007	取消节点
+	C001	开始节点	
+    public class cls_NodeType : cls_Base
+    {
+        #region "类型码常量"
+        /// <summary>
+        /// 开始节点
+        /// </summary>
+        public const string CODE_START = "C001";
+        /// <summary>
+        /// 终止节点
+        /// </summary>
+        public const string CODE_SUSPEND = "C002";
+        /// <summary>
+        /// 标准节点
+        /// </summary>
+        public const string CODE_STANDAR = "C003";
+        /// <summary>
+        /// 核决节点
+        /// </summary>
+        public const string CODE_HJ = "C004";
+        /// <summary>
+        /// 经办节点
+        /// </summary>
+        public const string CODE_JB = "C005";
+        /// <summary>
+        /// 结束节点
+        /// </summary>
+        public const string CODE_END = "C006";
+        /// <summary>
+        /// 取消节点
+        /// </summary>
+        public const string CODE_CANCEL = "C007";
+
+
+Big Step2: Parse Template Data from backend and show chart
+
+	Think :
+			problem :
+				p1. a node's chart json data , outputs array(mulit output id) ,
+				    inputs array(multi input id)
+					are without defined at template node json data.
+
+				p2.a link's chart json data ,fromConnector,toConnector
+					are without defined at template
+
+				p3.a link's fromConnector . toConnector ,both relationalship with nodes
+					
+
+
+	Prase Data Flow Thinking
+
+		While (Template node list count > 0 )
+		{
+
+			1.find start node ,and remove it from default template node list.
+			2.find output path array where the from Operator is start ndoe. &&
+			  find output node array from start node by 2.(node id == path.toOperator)
+			3.remove those pathes found at 2. where fromOperator is start node
+			
+			4.generate chart node by 1.,2 ,3 ---problem  
+
+
+
+		}//when Template ndoe list count > 0 do   	
